@@ -3,8 +3,24 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
+#include <string>
+#include <fstream>
+#include <sstream>
 #include "Parameters.h"
+
+namespace File
+{
+    std::string ReadFile(const char* path)
+    {
+        std::ifstream fs{path};
+        std::string file;
+        while (fs)
+            file.push_back(fs.get());
+        fs.close();
+        file.pop_back();
+        return file;
+    }
+}
 
 class OpenGL_Environment
 {
@@ -63,7 +79,7 @@ private:
 
 public:
     
-    static GLFWwindow* Initialize_Environment()
+    static GLFWwindow* Initialize()
     {
         GLFWwindow* window{NULL};
         
