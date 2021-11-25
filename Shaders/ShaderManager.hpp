@@ -2,6 +2,8 @@
 #define __SHADERMANAGER__
 
 #include <GL/glew.h>
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include "../Others/Utilities.hpp"
 
@@ -68,6 +70,34 @@ public:
         LogErrors(shader, GL_VALIDATE_STATUS);
 
         return shader;
+    }
+
+    static GLint GetUniformVariableAddress(GLuint program, const GLchar* name)
+    {
+        glUseProgram(program);
+        return glGetUniformLocation(program, name);
+        glUseProgram(0);
+    }
+
+    static void AssignIntegerToUniformVariable(GLuint program, GLint var_location, GLint value)
+    {
+        glUseProgram(program);
+        glUniform1i(var_location, value);
+        glUseProgram(0);
+    }
+    
+    static void AssignFloatToUniformVariable(GLuint program, GLint var_location, GLfloat value)
+    {
+        glUseProgram(program);
+        glUniform1f(var_location, value);
+        glUseProgram(0);
+    }
+
+    static void Assign4x4MatrixToUniformVariable(GLuint program, GLint var_location, glm::mat4& matrix)
+    {
+        glUseProgram(program);
+        glUniformMatrix4fv(var_location, 1, GL_FALSE, glm::value_ptr(matrix));
+        glUseProgram(0);
     }
 
 };
