@@ -72,7 +72,7 @@ public:
         return shader;
     }
 
-    static GLint GetUniformVariableAddress(GLuint program, const GLchar* name)
+    static GLuint GetUniformVariableLocation(GLuint program, const GLchar* name)
     {
         glUseProgram(program);
         return glGetUniformLocation(program, name);

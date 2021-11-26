@@ -2,6 +2,8 @@
 
 layout (location = 0) in vec3 pos;
 uniform int rotation_degrees;
+uniform mat4 translation_matrix, projection_matrix;
+out vec4 vColor;
 
 mat4 RotateX(float rotation_radians)
 {
@@ -42,14 +44,23 @@ mat4 RotateZ(float rotation_radians)
     return ret;
 }
 
-float DegreesToRadians()
+mat4 ScaleDown(float s)
 {
-    return ((rotation_degrees * 3.1415) / 180);
+    mat4 ret = mat4(
+        s, 0, 0, 0,
+        0, s, 0, 0,
+        0, 0, s, 0,
+        0, 0, 0, 1
+    );
+    return ret;
 }
 
-mat4 Spin(float radians) { return (RotateZ(radians) * RotateX(radians) * RotateY(radians)); }
+float DegreesToRadians() { return ((rotation_degrees * 3.1415) / 180); }
+
+mat4 Spin(float radians) { return (RotateY(radians) * RotateZ(radians) * RotateX(radians)); }
 
 void main()
 {
-    gl_Position = (Spin(DegreesToRadians()) *  vec4(pos, 1.0));
+    vColor = vec4(clamp(pos, 0.0f, 1.0f), 1.0);
+    gl_Position = (ScaleDown(0.6f) * projection_matrix * translation_matrix * Spin(DegreesToRadians()) * vec4(pos, 1.0));
 }
