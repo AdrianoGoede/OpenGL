@@ -12,9 +12,9 @@
 #include "Models/ModelDrawer.hpp"
 #include "Shaders/ShaderManager.hpp"
 
-float DegreesToRadians(unsigned short degrees);
+float DegreesToRadians(int degrees);
 void Render(GLFWwindow* window);
-void DisplayFrame(GLuint shader_program, GLuint vao);
+void DisplayFrame(GLuint shaderProgram, GLuint vao);
 
 int main()
 {
@@ -27,6 +27,8 @@ int main()
     return 0;
 }
 
+float DegreesToRadians(int degrees) { return ((degrees * 3.1415f) / 180); }
+
 void Render(GLFWwindow* window)
 {
     glEnable(GL_DEPTH_TEST);
@@ -34,19 +36,19 @@ void Render(GLFWwindow* window)
     glFrontFace(GL_CW);
     
     auto buffer{ModelDrawer::DrawHalfPyramid()};
-    GLuint shader_program{ShaderManager::ConstructShaderProgram("Shaders/Vertex Shaders/Spinning.glsl", "Shaders/Fragment Shaders/CoolGradient.glsl")};
+    GLuint shaderProgram{ShaderManager::ConstructShaderProgram("Shaders/Vertex Shaders/Spinning.glsl", "Shaders/Fragment Shaders/CoolGradient.glsl")};
     
-    auto rotation_var_location{ShaderManager::GetUniformVariableLocation(shader_program, "rotation_degrees")};
-    auto trans_mat_location{ShaderManager::GetUniformVariableLocation(shader_program, "translation_matrix")};
-    auto proj_mat_location{ShaderManager::GetUniformVariableLocation(shader_program, "projection_matrix")};
+    auto transMatLocation{ShaderManager::GetUniformVariableLocation(shaderProgram, "translationMatrix")};
+    auto projMatLocation{ShaderManager::GetUniformVariableLocation(shaderProgram, "projectionMatrix")};
+    auto rotationRadiansLocation{ShaderManager::GetUniformVariableLocation(shaderProgram, "rotationRadians")};
 
     int angle{0};
 
-    auto trans_matrix{glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f))};
-    ShaderManager::Assign4x4MatrixToUniformVariable(shader_program, trans_mat_location, trans_matrix);
+    auto transMatrix{glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f))};
+    ShaderManager::Assign4x4MatrixToUniformVariable(shaderProgram, transMatLocation, transMatrix);
     
-    auto proj_matrix{glm::perspective(45.0f, (GLfloat)(WindowWidth / WindowHeigth), 0.1f, 1.0f)};
-    ShaderManager::Assign4x4MatrixToUniformVariable(shader_program, proj_mat_location, proj_matrix);
+    auto projMatrix{glm::perspective(45.0f, (GLfloat)(WindowWidth / WindowHeigth), 0.1f, 1.0f)};
+    ShaderManager::Assign4x4MatrixToUniformVariable(shaderProgram, projMatLocation, projMatrix);
     
     while (!glfwWindowShouldClose(window)) {
         
@@ -55,17 +57,17 @@ void Render(GLFWwindow* window)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         angle = (++angle % 360);
-        ShaderManager::AssignIntegerToUniformVariable(shader_program, rotation_var_location, angle);
+        ShaderManager::AssignFloatToUniformVariable(shaderProgram, rotationRadiansLocation, DegreesToRadians(angle));
 
-        DisplayFrame(shader_program, buffer);
+        DisplayFrame(shaderProgram, buffer);
         glfwSwapBuffers(window);
 
     }
 }
 
-void DisplayFrame(GLuint shader_program, GLuint vao)
+void DisplayFrame(GLuint shaderProgram, GLuint vao)
 {
-    glUseProgram(shader_program);
+    glUseProgram(shaderProgram);
         glBindVertexArray(vao);
             // glDrawArrays(GL_TRIANGLES, 0, 3);
             glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);

@@ -11,11 +11,11 @@ class ShaderManager
 {
 private:
 
-    static void AddShader(GLuint program, const char* filepath, GLenum type)
+    static void AddShader(GLuint program, const char* filePath, GLenum type)
     {
-        const auto code{File::ReadFile(filepath)};
+        const auto code{File::ReadFile(filePath)};
         if (code.empty()) {
-            std::cout << "\nFile " << filepath << " is empty or was not found!";
+            std::cout << "\nFile " << filePath << " is empty or was not found!";
             return;
         }
 
@@ -52,7 +52,7 @@ private:
 
 public:
 
-    static GLuint ConstructShaderProgram(const char* vertex_shader_path, const char* fragment_shader_path)
+    static GLuint ConstructShaderProgram(const char* vertexShaderPath, const char* fragmentShaderPath)
     {
         GLuint shader{glCreateProgram()};
         if (!shader) {
@@ -60,8 +60,8 @@ public:
             return 0;
         }
 
-        AddShader(shader, vertex_shader_path, GL_VERTEX_SHADER);
-        AddShader(shader, fragment_shader_path, GL_FRAGMENT_SHADER);
+        AddShader(shader, vertexShaderPath, GL_VERTEX_SHADER);
+        AddShader(shader, fragmentShaderPath, GL_FRAGMENT_SHADER);
 
         glLinkProgram(shader);
         LogErrors(shader, GL_LINK_STATUS);
@@ -79,24 +79,24 @@ public:
         glUseProgram(0);
     }
 
-    static void AssignIntegerToUniformVariable(GLuint program, GLint var_location, GLint value)
+    static void AssignIntegerToUniformVariable(GLuint program, GLint varLocation, GLint value)
     {
         glUseProgram(program);
-        glUniform1i(var_location, value);
+        glUniform1i(varLocation, value);
         glUseProgram(0);
     }
     
-    static void AssignFloatToUniformVariable(GLuint program, GLint var_location, GLfloat value)
+    static void AssignFloatToUniformVariable(GLuint program, GLint varLocation, GLfloat value)
     {
         glUseProgram(program);
-        glUniform1f(var_location, value);
+        glUniform1f(varLocation, value);
         glUseProgram(0);
     }
 
-    static void Assign4x4MatrixToUniformVariable(GLuint program, GLint var_location, glm::mat4& matrix)
+    static void Assign4x4MatrixToUniformVariable(GLuint program, GLint varLocation, glm::mat4& matrix)
     {
         glUseProgram(program);
-        glUniformMatrix4fv(var_location, 1, GL_FALSE, glm::value_ptr(matrix));
+        glUniformMatrix4fv(varLocation, 1, GL_FALSE, glm::value_ptr(matrix));
         glUseProgram(0);
     }
 

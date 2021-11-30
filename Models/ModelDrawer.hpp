@@ -16,20 +16,20 @@ private:
         return vao;
     }
 
-    static void InitializeVBO(GLfloat* vertices, unsigned int num_vertices)
+    static void InitializeVBO(GLfloat* vertices, unsigned int numVertices)
     {
         GLuint vbo;
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, num_vertices, vertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, numVertices, vertices, GL_STATIC_DRAW);
     }
 
-    static void InitializeIBO(GLuint* indices, unsigned int num_indices)
+    static void InitializeIBO(GLuint* indices, unsigned int numIndices)
     {
         GLuint ibo;
         glGenBuffers(1, &ibo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_indices, indices, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices, indices, GL_STATIC_DRAW);
     }
 
     static void Finish()
@@ -45,13 +45,13 @@ private:
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
     
-    static GLuint CreateBuffers(GLfloat* vertices, unsigned int num_vertices, GLuint* indices, unsigned int num_indices)
+    static GLuint CreateBuffers(GLfloat* vertices, unsigned int numVertices, GLuint* indices, unsigned int numIndices)
     {
         GLuint vao{InitializeVAO()};
         
-        InitializeVBO(vertices, num_vertices);
-        if (num_indices > 0)
-            InitializeIBO(indices, num_indices);
+        InitializeVBO(vertices, numVertices);
+        if (numIndices > 0)
+            InitializeIBO(indices, numIndices);
 
         Finish();
         Cleanup();
