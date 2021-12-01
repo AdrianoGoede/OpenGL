@@ -11,6 +11,7 @@
 #include "Others/Utilities.hpp"
 #include "Models/ModelDrawer.hpp"
 #include "Shaders/ShaderManager.hpp"
+#include "Input/InputManager.hpp"
 
 float DegreesToRadians(int degrees);
 void Render(GLFWwindow* window);
@@ -34,6 +35,9 @@ void Render(GLFWwindow* window)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
+
+    InputManager::SetCallbacks(window);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     
     auto buffer{ModelDrawer::DrawHalfPyramid()};
     GLuint shaderProgram{ShaderManager::ConstructShaderProgram("Shaders/Vertex Shaders/Spinning.glsl", "Shaders/Fragment Shaders/CoolGradient.glsl")};
