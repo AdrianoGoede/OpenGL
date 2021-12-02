@@ -1,14 +1,13 @@
 #ifndef __INPUTMANAGER__
 #define __INPUTMANAGER__
 
-#include <iostream>
 #include <GLFW/glfw3.h>
 
 namespace InputManager
 {
-    static bool _keys[1024]{false};
+    static bool _keys[1024];
     GLfloat _lastX, _lastY;
-    GLfloat _xChange, _yChange;
+    GLfloat _xChange = 0.0f, _yChange = 0.0f;
     bool _mouseAlreadyMoved{false};
 
     static void HandleKeys(GLFWwindow* window, int key, int code, int action, int mode)

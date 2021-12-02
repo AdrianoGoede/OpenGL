@@ -12,9 +12,12 @@
 #include "Models/ModelDrawer.hpp"
 #include "Shaders/ShaderManager.hpp"
 #include "Input/InputManager.hpp"
+#include "Camera/Camera.hpp"
 
-float DegreesToRadians(int degrees);
 void Render(GLFWwindow* window);
+void SetConfigs();
+void SetInput(GLFWwindow* window);
+void PrepareNewFrame();
 void DisplayFrame(GLuint shaderProgram, GLuint vao);
 
 int main()
@@ -28,45 +31,64 @@ int main()
     return 0;
 }
 
-float DegreesToRadians(int degrees) { return ((degrees * 3.1415f) / 180); }
-
 void Render(GLFWwindow* window)
 {
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CW);
-
-    InputManager::SetCallbacks(window);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    SetConfigs();
+    SetInput(window);
     
     auto buffer{ModelDrawer::DrawHalfPyramid()};
-    GLuint shaderProgram{ShaderManager::ConstructShaderProgram("Shaders/Vertex Shaders/Spinning.glsl", "Shaders/Fragment Shaders/CoolGradient.glsl")};
+    GLuint shaderProgram{ShaderManager::ConstructShaderProgram("Shaders/Vertex Shaders/ControllableCamera.glsl", "Shaders/Fragment Shaders/CoolGradient.glsl")};
+    Camera camera{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), InitialYaw, InitialPitch, MovementSpeed, TurnSpeed};
     
     auto transMatLocation{ShaderManager::GetUniformVariableLocation(shaderProgram, "translationMatrix")};
     auto projMatLocation{ShaderManager::GetUniformVariableLocation(shaderProgram, "projectionMatrix")};
-    auto rotationRadiansLocation{ShaderManager::GetUniformVariableLocation(shaderProgram, "rotationRadians")};
+    auto viewMatLocation{ShaderManager::GetUniformVariableLocation(shaderProgram, "viewMatrix")};
 
-    int angle{0};
-
-    auto transMatrix{glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.5f))};
+    auto transMatrix{glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -4.5f))};
     ShaderManager::Assign4x4MatrixToUniformVariable(shaderProgram, transMatLocation, transMatrix);
     
-    auto projMatrix{glm::perspective(45.0f, (GLfloat)(WindowWidth / WindowHeigth), 0.1f, 1.0f)};
+    auto projMatrix{glm::perspective(45.0f, (GLfloat)(WindowWidth / WindowHeigth), 0.1f, 100.0f)};
     ShaderManager::Assign4x4MatrixToUniformVariable(shaderProgram, projMatLocation, projMatrix);
+
+    GLfloat deltaTime = 0.0f, lastTime = 0.0f;
+    glm::mat4 viewMatrix;
     
     while (!glfwWindowShouldClose(window)) {
         
-        glfwPollEvents();
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        angle = (++angle % 360);
-        ShaderManager::AssignFloatToUniformVariable(shaderProgram, rotationRadiansLocation, DegreesToRadians(angle));
+        GLfloat now = glfwGetTime();
+        deltaTime = (now - lastTime);
+        lastTime = now;
+
+        PrepareNewFrame();
+
+        camera.HandleKeyboardInput(deltaTime, InputManager::_keys);
+        viewMatrix = camera.GetViewMatrix();
+        ShaderManager::Assign4x4MatrixToUniformVariable(shaderProgram, viewMatLocation, viewMatrix);
 
         DisplayFrame(shaderProgram, buffer);
         glfwSwapBuffers(window);
 
     }
+}
+
+void SetConfigs()
+{
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
+}
+
+void SetInput(GLFWwindow* window)
+{
+    InputManager::SetCallbacks(window);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+void PrepareNewFrame()
+{
+    glfwPollEvents();
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Black
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void DisplayFrame(GLuint shaderProgram, GLuint vao)
