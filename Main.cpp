@@ -62,6 +62,7 @@ void Render(GLFWwindow* window)
         PrepareNewFrame();
 
         camera.HandleKeyboardInput(deltaTime, InputManager::_keys);
+        camera.HandleMouseInput(InputManager::_xChange, InputManager::_yChange);
         viewMatrix = camera.GetViewMatrix();
         ShaderManager::Assign4x4MatrixToUniformVariable(shaderProgram, viewMatLocation, viewMatrix);
 

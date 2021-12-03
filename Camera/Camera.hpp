@@ -57,6 +57,23 @@ public:
             _position += (_right * speed);
     }
 
+    void HandleMouseInput(GLfloat& xChange, GLfloat& yChange)
+    {
+        xChange *= _turnSpeed;
+        yChange *= _turnSpeed;
+
+        _yaw += xChange;
+        _pitch += yChange;
+
+        _pitch = ((_pitch > 89.0f) ? 89.0f : _pitch);
+        _pitch = ((_pitch < -89.0f) ? -89.0f : _pitch);
+
+        xChange = 0.0f;
+        yChange = 0.0f;
+
+        this->Update();
+    }
+
     glm::mat4 GetViewMatrix()
     {
         return glm::lookAt(_position, (_position + _front), _up);
